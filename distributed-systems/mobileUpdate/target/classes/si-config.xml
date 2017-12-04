@@ -28,13 +28,6 @@
 
     <int-stream:stdout-channel-adapter id="stdOutAdapter" channel="stdOutHTTPChannel" append-newline="true"/>
 
-	<!--int-http:inbound-gateway request-channel="mobileRequestChannel"
-                               url="http://localhost:8090/getmobiles?model={n}"
-                               http-method="GET"
-                               expected-payload-type="hu.uni.miskolc.struct.Mobile">
-    				<int-http:uri-variable name="n" expression="payload"/>
-    </int-http:inbound-gateway-->
-
 	<int-http:outbound-gateway request-channel="mobileRequestChannel"
                                url="http://localhost:8080/web/find?model={n}"
                                http-method="GET"

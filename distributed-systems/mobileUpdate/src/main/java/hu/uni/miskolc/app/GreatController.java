@@ -64,7 +64,7 @@ public class GreatController {
     }
     
     @RequestMapping("/lista")
-    public String getAllPeople(String name,Model model) {
+    public String getAllMobiles(String name,Model model) {
         model.addAttribute("mobiles", Application.gateway.listAllMobiles());
     	return "lista";
     }

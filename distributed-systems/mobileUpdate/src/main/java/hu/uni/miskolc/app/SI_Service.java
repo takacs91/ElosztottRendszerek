@@ -12,7 +12,7 @@ public interface SI_Service {
 	  Collection<Mobile> listAllMobiles();
 
 	  void addMobile(@Payload Mobile mobile);
-	  Mobile getMobile(@Payload String name);
+	  Mobile getMobile(@Payload String model);
 	  void deleteMobile(@Payload String name);
 	
 }
