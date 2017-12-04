@@ -1,0 +1,4 @@
+hu\uni\miskolc\model\Brand.class
+hu\uni\miskolc\systems\App.class
+hu\uni\miskolc\systems\gateway\MobileSearchGateway.class
+hu\uni\miskolc\model\Mobile.class

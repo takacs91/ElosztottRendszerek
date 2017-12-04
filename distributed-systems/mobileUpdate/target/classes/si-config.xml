@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+       xmlns:int-file="http://www.springframework.org/schema/integration/file"
+       xmlns:int-http="http://www.springframework.org/schema/integration/http"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+        http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+        http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+        ">
+
+    <int:gateway id="SI_Service" service-interface="hu.uni.miskolc.app.SI_Service" >
+        <int:method name="listAllMobiles" request-channel="mobilesRequestChannel" request-timeout="1000"/>
+        <int:method name="addMobile" request-channel="mobileRegistrationRequestChannel"/>
+        <int:method name="getMobile" request-channel="mobileRequestChannel" request-timeout="1000"/>
+        <int:method name="deleteMobile" request-channel="mobileRemoveChannel" request-timeout="1000"/>   
+    </int:gateway>
+
+    <int:channel id="mobileRequestChannel"/>
+	<int:channel id="mobileRemoveChannel"/>
+    <int:channel id="mobileRegistrationRequestChannel"/>
+    <int:channel id="mobilesRequestChannel"/>
+    <int:channel id="stdOutHTTPChannel"/>
+
+    <int-stream:stdout-channel-adapter id="stdOutAdapter" channel="stdOutHTTPChannel" append-newline="true"/>
+
+	<!--int-http:inbound-gateway request-channel="mobileRequestChannel"
+                               url="http://localhost:8090/getmobiles?model={n}"
+                               http-method="GET"
+                               expected-payload-type="hu.uni.miskolc.struct.Mobile">
+    				<int-http:uri-variable name="n" expression="payload"/>
+    </int-http:inbound-gateway-->
+
+	<int-http:outbound-gateway request-channel="mobileRequestChannel"
+                               url="http://localhost:8080/web/find?model={n}"
+                               http-method="GET"
+                               expected-response-type="hu.uni.miskolc.struct.Mobile">
+    				<int-http:uri-variable name="n" expression="payload"/>
+    </int-http:outbound-gateway>
+    
+    <int-http:outbound-gateway request-channel="mobileRemoveChannel"
+                               url="http://localhost:8080/web/delete?model={n}"
+                               http-method="GET"
+                               expected-response-type="hu.uni.miskolc.struct.Mobile"
+    						   reply-channel="stdOutHTTPChannel">
+    				<int-http:uri-variable name="n" expression="payload"/>
+    </int-http:outbound-gateway>
+    
+    <int-http:outbound-gateway request-channel="mobilesRequestChannel"
+                               url="http://localhost:8080/web/mobile/list"
+                               http-method="GET"
+                               expected-response-type="hu.uni.miskolc.struct.Mobile[]">
+    </int-http:outbound-gateway>
+
+    <int-http:outbound-gateway
+            request-channel="mobileRegistrationRequestChannel"
+            url="http://localhost:8080/web/mobile/register?mod={mod}&amp;rd={rd}&amp;br={br}"
+            http-method="GET"
+            reply-channel="stdOutHTTPChannel"
+            expected-response-type="java.lang.String">
+
+        <int-http:uri-variable name="mod" expression="payload.getModel()"/>
+        <int-http:uri-variable name="rd" expression="payload.getReleaseDate()"/>
+        <int-http:uri-variable name="br" expression="payload.getBrand()"/>
+    </int-http:outbound-gateway>
+
+</beans>

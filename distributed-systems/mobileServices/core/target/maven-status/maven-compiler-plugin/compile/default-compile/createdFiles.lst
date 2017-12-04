@@ -1,0 +1,4 @@
+hu\uni\miskolc\model\Brand.class
+hu\uni\miskolc\service\MobileManagerService.class
+hu\uni\miskolc\service\MobileSearchService.class
+hu\uni\miskolc\model\Mobile.class

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+       xmlns:int-file="http://www.springframework.org/schema/integration/file"
+       xmlns:int-http="http://www.springframework.org/schema/integration/http"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+        http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+        http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+        ">
+
+    <int:gateway id="MobileSearchGateway" service-interface="hu.uni.miskolc.systems.gateway.MobileSearchGateway" >
+        <int:method name="listAllMobile" request-channel="mobilesRequestChannel"
+                    request-timeout="1000"/>
+        <int:method name="addMobile" request-channel="mobileRegistrationRequestChannel"/>
+        <int:method name="getMobile" request-channel="mobileRequestChannel"
+                    request-timeout="1000"/>
+        <int:method name="deleteMobile" request-channel="mobileRemoveChannel" request-timeout="1000"/>   
+    </int:gateway>
+
+    <int:channel id="mobileRequestChannel"/>
+	<int:channel id="mobileRemoveChannel"/>
+
+    <int:channel id="stdOutChannel"/>
+    <int:channel id="chatChannel"/>
+    <int:channel id="surveillanceChannel"/>
+
+    <int:channel id="mobileRegistrationRequestChannel"/>
+    <int:channel id="mobilesRequestChannel"/>
+    <int:channel id="httpResponseChannel"/>
+
+    <int:recipient-list-router id="chatRouter" input-channel="chatChannel">
+        <int:recipient channel="stdOutChannel"/>
+        <int:recipient channel="surveillanceChannel"/>
+    </int:recipient-list-router>
+
+    <int-stream:stdout-channel-adapter id="stdOutAdapter" channel="stdOutChannel" append-newline="true"/>
+
+    <int-file:outbound-channel-adapter id="surveillanceAdapter" channel="surveillanceChannel" directory="surveilance" filename-generator-expression="'chat.log'" mode="APPEND"/>
+
+	<int-http:outbound-gateway request-channel="mobileRequestChannel"
+                               url="http://localhost:8080/web/find?model={n}"
+                               http-method="GET"
+                               expected-response-type="hu.uni.miskolc.model.Mobile">
+    				<int-http:uri-variable name="n" expression="payload"/>
+    </int-http:outbound-gateway>
+    
+    <int-http:outbound-gateway request-channel="mobileRemoveChannel"
+                               url="http://localhost:8080/web/delete?model={n}"
+                               http-method="GET"
+                               expected-response-type="hu.uni.miskolc.model.Mobile"
+    						   reply-channel="httpResponseChannel">
+    				<int-http:uri-variable name="n" expression="payload"/>
+    </int-http:outbound-gateway>
+    
+    <int:logging-channel-adapter channel="httpResponseChannel" level="WARN" expression="'REPLY: '  + #this"/>
+
+    <int-http:outbound-gateway request-channel="mobilesRequestChannel"
+                               url="http://localhost:8080/web/mobile/list"
+                               http-method="GET"
+                               expected-response-type="hu.uni.miskolc.model.Mobile[]">
+    </int-http:outbound-gateway>
+
+    <int-http:outbound-gateway
+            request-channel="mobileRegistrationRequestChannel"
+            url="http://localhost:8080/web/mobile/register?mod={mod}&amp;rd={rd}&amp;br={br}"
+            http-method="GET"
+            reply-channel="stdOutChannel"
+            expected-response-type="java.lang.String">
+
+        <int-http:uri-variable name="mod" expression="payload.getModel()"/>
+        <int-http:uri-variable name="rd" expression="payload.getReleaseDate()"/>
+        <int-http:uri-variable name="br" expression="payload.getBrand()"/>
+    </int-http:outbound-gateway>
+
+</beans>

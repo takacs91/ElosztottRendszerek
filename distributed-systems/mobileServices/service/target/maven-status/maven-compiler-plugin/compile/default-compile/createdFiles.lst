@@ -1,0 +1,3 @@
+hu\uni\miskolc\service\dao\MobileDAO.class
+hu\uni\miskolc\service\impl\MobileManagerServiceImpl.class
+hu\uni\miskolc\service\impl\MobileSearchServiceImpl.class

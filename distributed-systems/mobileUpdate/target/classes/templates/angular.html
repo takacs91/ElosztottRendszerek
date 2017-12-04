@@ -1,0 +1,93 @@
+<html lang="en" >
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+  </link>
+  <link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body ng-app="MyApp">
+
+<nav class="navbar navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Spring</a>
+			</div>
+			<div id="navbar" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li><a href="/page">Home</a></li>
+					<li><a href="/lista">Collection</a></li>
+					<li><a href="/form">Form</a></li>
+					<li><a href="/getpeople">Sample</a></li>
+					<li><a href="/greeting">Greeting</a></li>
+					<li class="active"><a href="#">Update</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+
+
+  <div class="container">
+  <md-content ng-controller="AppCtrl as ctrl" layout-padding="20" ng-cloak="" class="datepickerdemoBasicUsage" ng-app="MyApp">
+  
+  <!--form name = "projectForm"-->
+  	<form action="#" th:action="@{/ang}" th:object="${mobile}" method="post">
+   	<md-input-container class = "md-block">
+   		<label>Model</label>
+      	<input required-name = "userName" ng-model = "ctrl.userName" type="text" th:field="*{model}">
+      		<div ng-messages = "projectForm.userName.$error"><div ng-message = "required">This is required.</div></div>
+      	</input>
+     </md-input-container>
+     <md-input-container class = "md-block">
+   		<label>Release date</label>
+      	<input type="text" th:field="*{releaseDate}"></input>
+     </md-input-container>
+     
+     <md-input-container style="margin-right: 10px;">
+        <label>Brand</label>
+        <md-select ng-model="size">
+          <md-option ng-repeat="size in ctrl.sizes" value="{{size}}">{{size}}</md-option>
+        </md-select>
+      </md-input-container>
+  	  
+  	  <p>
+  	  </p>
+  	  <input type="submit" name="submit" value="Submit" />
+     </form>
+  	  <!--md-button>{{ctrl.button}} </md-button-->
+  
+  
+  <!-- /form-->
+  </md-content>
+  </div>
+  <!-- Angular Material requires Angular.js Libraries -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+
+  <!-- Angular Material Library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+  
+  <!-- Application bootstrap  -->
+  <script type="text/javascript">    
+  	angular.module('MyApp', ['ngMaterial', 'ngMessages']).controller('AppCtrl', function() {
+	  this.myDate = new Date();
+	  this.isOpen = false;
+	  this.userName="Jack";
+	  this.sizes = [
+	                  "MALE",
+	                  "FEMALE",
+	                  "MIXED",
+	                  "ROBOT"
+	              ];
+	  this.button='ADD PERSON';
+	});
+  
+    <!--angular.module('BlankApp', ['ngMaterial']);-->
+  </script>
+  
+</body>
+</html>
